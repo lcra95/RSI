@@ -4,6 +4,7 @@ import numpy as np
 from binance.client import Client
 import talib
 import logging
+import requests
 
 logging.basicConfig(filename='FUNUSDT.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
@@ -11,6 +12,21 @@ api_key = 'iVT1aRRukap9b12jlFqrjU8ix0QOREoffD41Ey1VvLEPRWDDXt0fL2PyYVxQaQrm'
 api_secret = '4byprzjIvjJfIbo0bbkg2o27buy1oFzMw0l6DydHe7y1ZdbAxF9XtszR5e5T0IKn'
 client = Client(api_key, api_secret)
 
+
+def send_telegram_message(message):
+    token = '6609889311:AAFIVvD_0pJuz7myNLsy0QJzYo5TNDp1kKk'
+    chat_id = '5090328284'
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    data = {
+        "chat_id": chat_id,
+        "text": message
+    }
+    try:
+        response = requests.post(url, data=data)
+        return response.json()
+    except Exception as e:
+        logging.error(f"Error al enviar mensaje de Telegram: {e}")
+        print(f"Error al enviar mensaje de Telegram: {e}")
 
 def get_current_price(symbol):
     ticker = client.get_symbol_ticker(symbol=symbol)
@@ -68,6 +84,7 @@ def buy_crypto(client, symbol, amount_usd):
             order = client.order_market_buy(symbol=symbol, quantity=quantity)
             logging.info(f"Orden de compra ejecutada: {order}")
             print(f"Orden de compra ejecutada: {order}")
+            send_telegram_message(f"Compra info {order}")
             return order
         except Exception as e:
             logging.error(f"Error al realizar la compra: {e}")
@@ -96,6 +113,7 @@ def sell_crypto(client, symbol):
             order = client.order_market_sell(symbol=symbol, quantity=quantity)
             logging.info(f"Orden de venta ejecutada: {order}")
             print(f"Orden de venta ejecutada: {order}")
+            send_telegram_message(f"Venta info {order}")
             return order
         else:
             logging.error("No se pudo obtener la información de LOT_SIZE para la venta")
@@ -124,7 +142,7 @@ def main():
             print(f"RSI Actual: {rsi[-1]}, Precio Actual: {current_price}")
 
             if not in_position and 30 <= rsi[-1] <= 35:
-                order = buy_crypto(client, symbol, 40)
+                order = buy_crypto(client, symbol, 39)
                 if order:
                     purchase_price = current_price
                     in_position = True
