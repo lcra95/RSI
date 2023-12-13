@@ -1,0 +1,27 @@
+2023-12-13 15:57:48,453 - RSI Actual: 39.54146604434172, Precio Actual: 1.253
+2023-12-13 15:58:49,312 - RSI Actual: 40.72154252508057, Precio Actual: 1.254
+2023-12-13 15:58:50,001 - Error al realizar la compra: APIError(code=-1111): Parameter 'quantity' has too much precision.
+2023-12-13 15:59:50,797 - RSI Actual: 35.130189782869614, Precio Actual: 1.247
+2023-12-13 16:02:33,309 - RSI Actual: 34.16719936173667, Precio Actual: 1.246
+2023-12-13 16:02:52,578 - RSI Actual: 34.16719936173667, Precio Actual: 1.246
+2023-12-13 16:02:53,447 - Error al realizar la compra: APIError(code=-1013): Filter failure: LOT_SIZE
+2023-12-13 16:03:54,173 - RSI Actual: 33.336557074272996, Precio Actual: 1.245
+2023-12-13 16:03:54,868 - Error al realizar la compra: APIError(code=-1013): Filter failure: LOT_SIZE
+2023-12-13 16:04:55,582 - RSI Actual: 28.17328643877439, Precio Actual: 1.238
+2023-12-13 16:05:56,302 - RSI Actual: 33.56737452623902, Precio Actual: 1.241
+2023-12-13 16:05:57,537 - Error al realizar la compra: APIError(code=-1013): Filter failure: LOT_SIZE
+2023-12-13 16:06:58,247 - RSI Actual: 54.746092971040916, Precio Actual: 1.269
+2023-12-13 16:07:58,966 - RSI Actual: 57.903790589247464, Precio Actual: 1.266
+2023-12-13 16:08:59,790 - RSI Actual: 59.30597933066897, Precio Actual: 1.268
+2023-12-13 16:10:00,535 - RSI Actual: 66.51327165662012, Precio Actual: 1.28
+2023-12-13 16:11:01,299 - RSI Actual: 66.5132716566201, Precio Actual: 1.28
+2023-12-13 16:12:02,127 - RSI Actual: 55.17919245767422, Precio Actual: 1.268
+2023-12-13 16:13:02,895 - RSI Actual: 58.94611652257515, Precio Actual: 1.274
+2023-12-13 16:14:03,664 - RSI Actual: 58.52780093778058, Precio Actual: 1.274
+2023-12-13 16:15:04,490 - RSI Actual: 57.219813406359144, Precio Actual: 1.272
+2023-12-13 16:16:05,210 - RSI Actual: 57.93419528364726, Precio Actual: 1.272
+2023-12-13 16:17:05,993 - RSI Actual: 51.45662975027512, Precio Actual: 1.266
+2023-12-13 16:18:07,592 - RSI Actual: 50.58647223815696, Precio Actual: 1.262
+2023-12-13 16:19:08,418 - RSI Actual: 51.47026239929392, Precio Actual: 1.266
+2023-12-13 16:20:09,189 - RSI Actual: 61.77736584307174, Precio Actual: 1.278
+2023-12-13 16:21:09,907 - RSI Actual: 53.740436696707036, Precio Actual: 1.271
