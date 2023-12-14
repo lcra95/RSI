@@ -131,6 +131,7 @@ def main():
     lookback = 500
     in_position = False
     purchase_price = 0
+    stop_loss_percentage = 4
 
     while True:
         try:
@@ -141,7 +142,7 @@ def main():
             logging.info(f"RSI Actual: {rsi[-1]}, Precio Actual: {current_price}")
             print(f"RSI Actual: {rsi[-1]}, Precio Actual: {current_price}")
 
-            if not in_position and 30 <= rsi[-1] <= 35:
+            if not in_position and rsi[-1] < 30:
                 order = buy_crypto(client, symbol, 39)
                 if order:
                     purchase_price = current_price
@@ -149,7 +150,7 @@ def main():
                     logging.info(f"Comprado {symbol} a {purchase_price} USD")
                     print(f"Comprado {symbol} a {purchase_price} USD")
 
-            elif in_position and rsi[-1] > 35:
+            elif in_position and rsi[-1] > 30:
                 percentage_change = calculate_percentage_change(current_price, purchase_price)
                 if percentage_change > 2:
                     order = sell_crypto(client, symbol)
@@ -157,6 +158,15 @@ def main():
                         in_position = False
                         logging.info(f"Vendido {symbol}. Detalles de la orden: {order}")
                         print(f"Vendido {symbol}. Detalles de la orden: {order}")
+
+            if in_position:
+                current_change = calculate_percentage_change(current_price, purchase_price)
+                if current_change <= -stop_loss_percentage:
+                    order = sell_crypto(client, symbol)
+                    if order:
+                        in_position = False
+                        logging.info(f"Stop loss activado, vendido {symbol}. Detalles de la orden: {order}")
+                        print(f"Stop loss activado, vendido {symbol}. Detalles de la orden: {order}")
 
             time.sleep(60)
 
