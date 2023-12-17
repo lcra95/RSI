@@ -6,8 +6,6 @@ import talib
 import logging
 import requests
 
-logging.basicConfig(filename='FUNUSDT.log', level=logging.INFO, format='%(asctime)s - %(message)s')
-
 api_key = 'iVT1aRRukap9b12jlFqrjU8ix0QOREoffD41Ey1VvLEPRWDDXt0fL2PyYVxQaQrm'
 api_secret = '4byprzjIvjJfIbo0bbkg2o27buy1oFzMw0l6DydHe7y1ZdbAxF9XtszR5e5T0IKn'
 client = Client(api_key, api_secret)
@@ -84,7 +82,7 @@ def buy_crypto(client, symbol, amount_usd):
             order = client.order_market_buy(symbol=symbol, quantity=quantity)
             logging.info(f"Orden de compra ejecutada: {order}")
             print(f"Orden de compra ejecutada: {order}")
-            send_telegram_message(f"Compra info {order}")
+            send_telegram_message(f"Compra de {symbol} a {current_price} la cantidad de {quantity} ")
             return order
         except Exception as e:
             logging.error(f"Error al realizar la compra: {e}")
@@ -113,7 +111,7 @@ def sell_crypto(client, symbol):
             order = client.order_market_sell(symbol=symbol, quantity=quantity)
             logging.info(f"Orden de venta ejecutada: {order}")
             print(f"Orden de venta ejecutada: {order}")
-            send_telegram_message(f"Venta info {order}")
+            send_telegram_message(f"Venta {symbol} la cantidad de {quantity}")
             return order
         else:
             logging.error("No se pudo obtener la información de LOT_SIZE para la venta")
@@ -126,12 +124,18 @@ def sell_crypto(client, symbol):
 
 
 def main():
-    symbol = 'FUNUSDT'
+    symbol = 'MAVUSDT'
+    logging.basicConfig(filename=f'{symbol}.log', level=logging.INFO, format='%(asctime)s - %(message)s')
     interval = Client.KLINE_INTERVAL_1MINUTE
     lookback = 500
     in_position = False
     purchase_price = 0
-    stop_loss_percentage = 4
+    stop_loss_percentage = 3
+    sell_percentage = 3
+    last_stop_loss_time = 0
+    amount_usdt = 100
+    rsi_limit = 28
+    stop_loss_count = 0
 
     while True:
         try:
@@ -142,17 +146,17 @@ def main():
             logging.info(f"RSI Actual: {rsi[-1]}, Precio Actual: {current_price}")
             print(f"RSI Actual: {rsi[-1]}, Precio Actual: {current_price}")
 
-            if not in_position and rsi[-1] < 30:
-                order = buy_crypto(client, symbol, 39)
+            if not in_position and (time.time() - last_stop_loss_time) >= 2400 and rsi[-1] < rsi_limit:
+                order = buy_crypto(client, symbol, amount_usdt)
                 if order:
                     purchase_price = current_price
                     in_position = True
                     logging.info(f"Comprado {symbol} a {purchase_price} USD")
                     print(f"Comprado {symbol} a {purchase_price} USD")
 
-            elif in_position and rsi[-1] > 30:
+            elif in_position and rsi[-1] > rsi_limit:
                 percentage_change = calculate_percentage_change(current_price, purchase_price)
-                if percentage_change > 2:
+                if percentage_change > sell_percentage:
                     order = sell_crypto(client, symbol)
                     if order:
                         in_position = False
@@ -164,10 +168,18 @@ def main():
                 if current_change <= -stop_loss_percentage:
                     order = sell_crypto(client, symbol)
                     if order:
+                        stop_loss_count += 1
+                        last_stop_loss_time = time.time()
                         in_position = False
+                        send_telegram_message(f"Stop Loss")
                         logging.info(f"Stop loss activado, vendido {symbol}. Detalles de la orden: {order}")
                         print(f"Stop loss activado, vendido {symbol}. Detalles de la orden: {order}")
-
+            if stop_loss_count == 2:
+                msj = f"El script se ha detenido para evitar perdidas {symbol}"
+                send_telegram_message(msj)
+                logging.info(msj)
+                print(msj)
+                break
             time.sleep(60)
 
         except Exception as e:
