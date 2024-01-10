@@ -1,15 +1,22 @@
-# Usa una imagen oficial de Python como imagen base
-FROM python:3.9
+# Utilizar la imagen base que incluye Python y TA-Lib
+FROM rezaq/ta-lib-python-3.8.10-slim
 
-# Establece el directorio de trabajo en el contenedor
-WORKDIR /app
+# Instalar GCC y otras herramientas de compilación
+RUN apt-get update && apt-get install -y \
+    gcc \
+    build-essential \
+    libffi-dev \
+    libssl-dev
 
-# Copia los archivos requeridos en el contenedor
+# Establecer el directorio de trabajo en el contenedor
+WORKDIR /usr/src/app
+
+# Copiar el archivo de requerimientos y instalar las dependencias de Python
 COPY requirements.txt ./
-COPY main.py ./
-
-# Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Comando para ejecutar el script
-CMD ["python", "./main.py"]
+# Copiar el resto del código fuente del proyecto al directorio de trabajo
+COPY . .
+
+# Comando para ejecutar la aplicación
+CMD [ "python", "./main.py" ]

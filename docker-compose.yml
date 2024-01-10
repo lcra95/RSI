@@ -1,0 +1,10 @@
+version: '3'
+services:
+  binance_bot:
+    build: .
+    restart: always
+    environment:
+      - API_KEY=your_api_key
+      - API_SECRET=your_api_secret
+      - TELEGRAM_TOKEN=6609889311:AAFIVvD_0pJuz7myNLsy0QJzYo5TNDp1kKk
+      - TELEGRAM_CHAT_ID=your_telegram_chat_id

@@ -12,7 +12,7 @@ client = Client(api_key, api_secret)
 
 
 def send_telegram_message(message):
-    token = '6609889311:AAFIVvD_0pJuz7myNLsy0QJzYo5TNDp1kKk'
+    token = os.getenv('TOKEN','6609889311:AAFIVvD_0pJuz7myNLsy0QJzYo5TNDp1kKk')
     chat_id = '5090328284'
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     data = {
@@ -124,25 +124,26 @@ def sell_crypto(client, symbol):
 
 
 def main():
-    symbol = 'MAVUSDT'
+    symbol = 'AIUSDT'
     logging.basicConfig(filename=f'{symbol}.log', level=logging.INFO, format='%(asctime)s - %(message)s')
     interval = Client.KLINE_INTERVAL_1MINUTE
     lookback = 500
     in_position = False
     purchase_price = 0
     stop_loss_percentage = 3
-    sell_percentage = 3
+    sell_percentage = 2.5
     last_stop_loss_time = 0
     amount_usdt = 100
     rsi_limit = 28
     stop_loss_count = 0
 
     while True:
+        
         try:
             close_prices = get_close_prices(symbol, interval, lookback)
             rsi = calculate_rsi(close_prices)
             current_price = get_current_price(symbol)
-
+            print(rsi[-1])
             logging.info(f"RSI Actual: {rsi[-1]}, Precio Actual: {current_price}")
             print(f"RSI Actual: {rsi[-1]}, Precio Actual: {current_price}")
 
@@ -174,12 +175,11 @@ def main():
                         send_telegram_message(f"Stop Loss")
                         logging.info(f"Stop loss activado, vendido {symbol}. Detalles de la orden: {order}")
                         print(f"Stop loss activado, vendido {symbol}. Detalles de la orden: {order}")
-            if stop_loss_count == 2:
-                msj = f"El script se ha detenido para evitar perdidas {symbol}"
-                send_telegram_message(msj)
-                logging.info(msj)
-                print(msj)
-                break
+            #if stop_loss_count == 10:
+            #    msj = f"El script se ha detenido para evitar perdidas {symbol}"
+            #    send_telegram_message(msj)
+            #    logging.info(msj)
+            #    break
             time.sleep(60)
 
         except Exception as e:
