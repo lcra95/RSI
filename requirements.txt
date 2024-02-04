@@ -1,4 +1,6 @@
-numpy
 python-binance
-TA-Lib
 requests
+pandas
+mysql-connector-python
+numpy
+openai
