@@ -341,7 +341,7 @@ def get_positive_balance_symbols():
 def main():
     print("HELLO EVERITING IS RUNNING")
     #symbols = get_positive_balance_symbols()
-    symbols = ['ENSUSDT', 'CBKUSDT','RONINUSDT', 'HBARUSDT' , 'PENDLEUSDT']  # Lista de símbolos a monitorear
+    symbols = ['ENSUSDT', 'CKBUSDT','RONINUSDT', 'HBARUSDT' , 'PENDLEUSDT']  # Lista de símbolos a monitorear
     symbol_data = {symbol: {'in_position': False, 'purchase_price': 0, 'last_stop_loss_time': 0} for symbol in symbols}
     logging.basicConfig(filename=f'file.log', level=logging.INFO, format='%(asctime)s - %(message)s')
     interval = Client.KLINE_INTERVAL_1MINUTE
