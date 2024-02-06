@@ -331,20 +331,28 @@ def chatGpt(prompt):
     respuesta_actual = respuestas['choices'][0]['message']['content']
     return respuesta_actual
 
+def get_positive_balance_symbols():
+    # Obtener información de todos los tickers
+    tickers = client.get_ticker()
+    positive_balance_symbols = [ticker['symbol'] for ticker in tickers if ticker['symbol'].endswith('USDT') and float(ticker['priceChangePercent']) > 5]
+
+    return positive_balance_symbols
 
 def main():
     print("HELLO EVERITING IS RUNNING")
-    symbols = ['XAIUSDT', 'LUNACUSDT', 'NMRUSDT', 'UTKUSDT', 'USTCUSDT', 'OMUSDT', 'DATAUSDT']  # Lista de símbolos a monitorear
+    #symbols = get_positive_balance_symbols()
+    symbols = ['SUIUSDT', 'LSKUSDT','OPUSDT']  # Lista de símbolos a monitorear
     symbol_data = {symbol: {'in_position': False, 'purchase_price': 0, 'last_stop_loss_time': 0} for symbol in symbols}
     logging.basicConfig(filename=f'file.log', level=logging.INFO, format='%(asctime)s - %(message)s')
     interval = Client.KLINE_INTERVAL_1MINUTE
     lookback = 500
-    stop_loss_percentage = 2.5
-    sell_percentage = 1.75
+    stop_loss_percentage = 3
+    sell_percentage = 2.5
     amount_usdt = 100
     rsi_limit = 28
     activar_gpt = 0
-
+    print(symbols)
+    
     while True:
         
         for symbol in symbols:
@@ -362,7 +370,7 @@ def main():
                 logging.info(f"RSI Actual para {symbol}: {rsi[-1]}, Precio Actual: {current_price}")
                 print(f"RSI Actual para {symbol}: {rsi[-1]}, Precio Actual: {current_price} Estocastico: {estocastico.iloc[-1]} - Tendencia {tendencia['tendencia']}")
 
-                if not symbol_data[symbol]['in_position'] and (time.time() - symbol_data[symbol]['last_stop_loss_time']) >= 2400 and rsi[-1] < rsi_limit and tendencia["tendencia"] == 1:
+                if not symbol_data[symbol]['in_position'] and (time.time() - symbol_data[symbol]['last_stop_loss_time']) >= 2400 and rsi[-1] < rsi_limit:
                     #pregunto a chatgpt si es conviene comprar
                     if activar_gpt == 1:
                         result = consulta_y_exporta_excel(symbol)
