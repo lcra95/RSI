@@ -175,14 +175,14 @@ def determinar_tendencia(data):
     sma_rapida_ultima = sma_rapida.iloc[-1]
     sma_lenta_ultima = sma_lenta.iloc[-1]
 
-    if sma_rapida_ultima > sma_lenta_ultima:
-        return {"tendencia" : 2, "lenta": sma_lenta_ultima, "rapida": sma_rapida_ultima}
-        
-    elif sma_rapida_ultima < sma_lenta_ultima:
-        return {"tendencia" : 1, "lenta": sma_lenta_ultima, "rapida": sma_rapida_ultima}
-    else:
-        return {"tendencia" : 0, "lenta": sma_lenta_ultima, "rapida": sma_rapida_ultima}
+    sma_rapida_penultima = sma_rapida.iloc[-2]
+    sma_lenta_penultima = sma_lenta.iloc[-2]
 
+    ma_crossover_buy = sma_rapida_penultima <= sma_lenta_penultima and sma_rapida_ultima > sma_lenta_ultima
+    ma_crossover_sell = sma_rapida_penultima > sma_lenta_penultima and sma_rapida_ultima <= sma_lenta_ultima
+
+    return {"buy_signal": bool(ma_crossover_buy), "sell_signal" : bool(ma_crossover_sell)}
+    
 
 def insertar_analisis_tecnico(simbolo, precio, rsi, msa_lenta_120, msa_rapida_30, estocastico):
     try:
@@ -281,7 +281,6 @@ def calcular_estocastico(data, periodo=14):
     except Exception as e:
         print(f"Error al procesar estocastico: {e}")
 
-
 def prompt_context(simbolo, datos):
     data = []
     base = f"""
@@ -341,14 +340,14 @@ def get_positive_balance_symbols():
 def main():
     print("HELLO EVERITING IS RUNNING")
     #symbols = get_positive_balance_symbols()
-    symbols = ['ENSUSDT', 'CKBUSDT','RONINUSDT', 'HBARUSDT' , 'PENDLEUSDT']  # Lista de símbolos a monitorear
+    symbols = ['RONINUSDT']  # Lista de símbolos a monitorear
     symbol_data = {symbol: {'in_position': False, 'purchase_price': 0, 'last_stop_loss_time': 0} for symbol in symbols}
     logging.basicConfig(filename=f'file.log', level=logging.INFO, format='%(asctime)s - %(message)s')
     interval = Client.KLINE_INTERVAL_1MINUTE
     lookback = 500
-    stop_loss_percentage = 3
-    sell_percentage = 2.5
-    amount_usdt = 50
+    stop_loss_percentage = 2.25
+    sell_percentage = 1.5
+    amount_usdt = 25
     rsi_limit = 25
     activar_gpt = 0
     print(symbols)
@@ -365,12 +364,14 @@ def main():
                 price = get_current_price(symbol)
                 data = get_data_estocastico(symbol, interval, 500)
                 estocastico = calcular_estocastico(data)
-                insertar_analisis_tecnico(symbol, price, rsi[-1],tendencia["lenta"], tendencia["rapida"], estocastico.iloc[-1])
+                #insertar_analisis_tecnico(symbol, price, rsi[-1],tendencia["lenta"], tendencia["rapida"], estocastico.iloc[-1])
 
                 logging.info(f"RSI Actual para {symbol}: {rsi[-1]}, Precio Actual: {current_price}")
-                print(f"RSI Actual para {symbol}: {rsi[-1]}, Precio Actual: {current_price} Estocastico: {estocastico.iloc[-1]} - Tendencia {tendencia['tendencia']}")
+                print(f"RSI Actual para {symbol}: {rsi[-1]}, Precio Actual: {current_price} Estocastico: {estocastico.iloc[-1]} - Tendencia {tendencia}")
 
-                if not symbol_data[symbol]['in_position'] and (time.time() - symbol_data[symbol]['last_stop_loss_time']) >= 2400 and rsi[-1] < rsi_limit:
+                #if not symbol_data[symbol]['in_position'] and (time.time() - symbol_data[symbol]['last_stop_loss_time']) >= 2400 and rsi[-1] < rsi_limit:
+                if not symbol_data[symbol]['in_position'] and (time.time() - symbol_data[symbol]['last_stop_loss_time']) >= 2400 and tendencia["buy_signal"] is True:
+                    print("hey")
                     #pregunto a chatgpt si es conviene comprar
                     if activar_gpt == 1:
                         result = consulta_y_exporta_excel(symbol)
@@ -393,10 +394,11 @@ def main():
                             logging.info(f"Comprado {symbol} a {current_price} USD")
 
 
-                elif symbol_data[symbol]['in_position'] and rsi[-1] > rsi_limit:
+                #elif symbol_data[symbol]['in_position'] and rsi[-1] > rsi_limit:
+                elif symbol_data[symbol]['in_position']:
                     percentage_change = calculate_percentage_change(current_price, symbol_data[symbol]['purchase_price'])
                     #if rsi[-1] > rsi_sell:# vendo por rsi no por porcentaje de ganancia
-                    if percentage_change > sell_percentage: #vendo por porcentaje de ganancia
+                    if percentage_change > sell_percentage or tendencia["sell_signal"] is True: #vendo por porcentaje de ganancia
                         order = sell_crypto(client, symbol)
                         if order:
                             symbol_data[symbol]['in_position'] = False
@@ -404,7 +406,7 @@ def main():
 
                 if symbol_data[symbol]['in_position']:
                     current_change = calculate_percentage_change(current_price, symbol_data[symbol]['purchase_price'])
-                    if current_change <= -stop_loss_percentage:
+                    if current_change <= -stop_loss_percentage or tendencia["sell_signal"] is True:
                         order = sell_crypto(client, symbol)
                         if order:
                             symbol_data[symbol]['last_stop_loss_time'] = time.time()
