@@ -340,14 +340,14 @@ def get_positive_balance_symbols():
 def main():
     print("HELLO EVERITING IS RUNNING")
     #symbols = get_positive_balance_symbols()
-    symbols = ['RONINUSDT', 'DYMUSDT', 'IDUSDT','CTSIUSDT','JUPUSDT', 'PYTHUSDT', 'ALTUSDT' ]  # Lista de símbolos a monitorear
+    symbols = ['DYMUSDT', 'IDUSDT','CTSIUSDT','JUPUSDT', 'XMRUSDT', 'ALTUSDT' ]  # Lista de símbolos a monitorear
     symbol_data = {symbol: {'in_position': False, 'purchase_price': 0, 'last_stop_loss_time': 0} for symbol in symbols}
     logging.basicConfig(filename=f'file.log', level=logging.INFO, format='%(asctime)s - %(message)s')
     interval = Client.KLINE_INTERVAL_1MINUTE
     lookback = 500
     stop_loss_percentage = 2.25
     sell_percentage = 1.5
-    amount_usdt = 25
+    amount_usdt = 35
     rsi_limit = 25
     activar_gpt = 0
     print(symbols)
