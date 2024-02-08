@@ -168,8 +168,8 @@ def determinar_tendencia(data):
     :return: String indicando la tendencia ('Alcista', 'Bajista', 'Indeterminada').
     """
     # Calcular la SMA rápida y lenta
-    sma_rapida = calcular_sma(data, 30)
-    sma_lenta = calcular_sma(data, 120)
+    sma_rapida = calcular_sma(data, 9)
+    sma_lenta = calcular_sma(data, 30)
 
     # Comparar las últimas SMA
     sma_rapida_ultima = sma_rapida.iloc[-1]
@@ -340,14 +340,14 @@ def get_positive_balance_symbols():
 def main():
     print("HELLO EVERITING IS RUNNING")
     #symbols = get_positive_balance_symbols()
-    symbols = ['CFXUSDT', 'IDUSDT','ARKMUSDT','OMUSDT', 'XMRUSDT', 'EDUUSDT' ]  # Lista de símbolos a monitorear
+    symbols = ['SOLUSDT', 'DYMUSDT'  ]  # Lista de símbolos a monitorear
     symbol_data = {symbol: {'in_position': False, 'purchase_price': 0, 'last_stop_loss_time': 0} for symbol in symbols}
     logging.basicConfig(filename=f'file.log', level=logging.INFO, format='%(asctime)s - %(message)s')
     interval = Client.KLINE_INTERVAL_1MINUTE
     lookback = 500
-    stop_loss_percentage = 2.25
-    sell_percentage = 1.5
-    amount_usdt = 35
+    stop_loss_percentage = 1
+    sell_percentage = 0.5
+    amount_usdt = 100
     rsi_limit = 25
     activar_gpt = 0
     print(symbols)
